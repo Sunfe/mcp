@@ -1,0 +1,26 @@
+# Windows 11 native Codex CLI -> this Linux server over SSH stdio.
+# Merge into %USERPROFILE%\.codex\config.toml (or %CODEX_HOME%\config.toml).
+[mcp_servers.knowledge-base]
+command = "ssh.exe"
+args = [
+  "-T",
+  "-o", "BatchMode=yes",
+  "-o", "ConnectTimeout=10",
+  "-o", "ServerAliveInterval=30",
+  "-o", "ServerAliveCountMax=3",
+  "-p", "22",
+  "liaozhic@66.245.192.250",
+  "bash /home/liaozhic/data/mcp/scripts/mcp_stdio.sh"
+]
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+enabled_tools = ["list_documents", "search_documents", "get_document"]
+
+[mcp_servers.knowledge-base.tools.list_documents]
+approval_mode = "approve"
+
+[mcp_servers.knowledge-base.tools.search_documents]
+approval_mode = "approve"
+
+[mcp_servers.knowledge-base.tools.get_document]
+approval_mode = "approve"

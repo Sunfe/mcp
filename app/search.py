@@ -1,3 +1,5 @@
+from contextlib import closing
+
 from app.db import get_conn
 
 
@@ -45,8 +47,12 @@ def get_document(document_id: int):
 
 
 def search_documents(query: str, limit: int = 5):
-    conn = get_conn()
-    cur = conn.cursor()
+    terms = query.split()
+    if not terms:
+        return []
+
+    # MATCH parses its own syntax even with SQL parameters. Quote each term as text.
+    fts_query = " AND ".join('"' + term.replace('"', '""') + '"' for term in terms)
 
     sql = """
     SELECT c.id AS chunk_id,
@@ -61,7 +67,6 @@ def search_documents(query: str, limit: int = 5):
     WHERE chunks_fts MATCH ?
     LIMIT ?
     """
-    cur.execute(sql, (query, limit))
-    rows = [dict(r) for r in cur.fetchall()]
-    conn.close()
-    return rows
+    with closing(get_conn()) as conn:
+        rows = conn.execute(sql, (fts_query, limit)).fetchall()
+        return [dict(row) for row in rows]

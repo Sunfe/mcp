@@ -1,0 +1,18 @@
+# Codex CLI and this knowledge server run on the same machine.
+# Merge this table into ~/.codex/config.toml (not together with the SSH variant).
+[mcp_servers.knowledge-base]
+command = "bash"
+args = ["/home/liaozhic/data/mcp/scripts/mcp_stdio.sh"]
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+enabled_tools = ["list_documents", "search_documents", "get_document"]
+
+# Allow the three read-only tools in interactive and non-interactive Codex CLI.
+[mcp_servers.knowledge-base.tools.list_documents]
+approval_mode = "approve"
+
+[mcp_servers.knowledge-base.tools.search_documents]
+approval_mode = "approve"
+
+[mcp_servers.knowledge-base.tools.get_document]
+approval_mode = "approve"

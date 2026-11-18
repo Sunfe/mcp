@@ -45,3 +45,9 @@ def api_search(req: SearchRequest):
 def api_reindex(req: ReindexRequest):
     run_ingest(full=req.full or False)
     return JSONResponse({"status": "ok", "full": req.full or False})
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host=settings.app_host, port=settings.app_port, log_level=settings.log_level)

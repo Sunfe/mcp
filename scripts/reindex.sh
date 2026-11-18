@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e
-cd /home/liaozhic/data/mcp
-source .venv/bin/activate
-python -m app.ingest
+set -euo pipefail
+cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.."
+exec .venv/bin/python -u -m app.ingest

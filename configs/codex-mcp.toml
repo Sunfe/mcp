@@ -1,0 +1,25 @@
+# Add this table to the Codex config on your LOCAL computer.
+# knowledge-server is an SSH host alias configured in ~/.ssh/config.
+[mcp_servers.knowledge-base]
+command = "ssh"
+args = [
+  "-T",
+  "-o", "BatchMode=yes",
+  "-o", "ConnectTimeout=10",
+  "-o", "ServerAliveInterval=30",
+  "-o", "ServerAliveCountMax=3",
+  "knowledge-server",
+  "bash /home/liaozhic/data/mcp/scripts/mcp_stdio.sh"
+]
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+enabled_tools = ["list_documents", "search_documents", "get_document"]
+
+[mcp_servers.knowledge-base.tools.list_documents]
+approval_mode = "approve"
+
+[mcp_servers.knowledge-base.tools.search_documents]
+approval_mode = "approve"
+
+[mcp_servers.knowledge-base.tools.get_document]
+approval_mode = "approve"

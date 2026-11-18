@@ -395,6 +395,8 @@ def extract_text(path: Path) -> str:
 
 ## 5）app/search.py
 ```python
+from contextlib import closing
+
 from app.db import get_conn
 
 
@@ -442,8 +444,12 @@ def get_document(document_id: int):
 
 
 def search_documents(query: str, limit: int = 5):
-    conn = get_conn()
-    cur = conn.cursor()
+    terms = query.split()
+    if not terms:
+        return []
+
+    # MATCH parses its own syntax even with SQL parameters. Quote each term as text.
+    fts_query = " AND ".join('"' + term.replace('"', '""') + '"' for term in terms)
 
     sql = """
     SELECT c.id AS chunk_id,
@@ -458,10 +464,9 @@ def search_documents(query: str, limit: int = 5):
     WHERE chunks_fts MATCH ?
     LIMIT ?
     """
-    cur.execute(sql, (query, limit))
-    rows = [dict(r) for r in cur.fetchall()]
-    conn.close()
-    return rows
+    with closing(get_conn()) as conn:
+        rows = conn.execute(sql, (fts_query, limit)).fetchall()
+        return [dict(row) for row in rows]
 ```
 
 ---
@@ -781,17 +786,45 @@ chmod +x /opt/mcp-knowledge/scripts/reindex.sh
 
 # 八、首次建立索引
 
+使用本仓库时，先进入项目根目录，检查根目录 `.env` 中的 `RAW_DIR` 和 `DB_PATH`。
+当前代码会将相对路径解析为相对于项目根目录的路径，绝对路径也可以使用。例如：
+
+```dotenv
+RAW_DIR=raw
+DB_PATH=data/knowledge.db
+```
+
+`RAW_DIR` 必须是实际存放文档的目录，支持递归扫描 `.txt`、`.pdf`、`.docx`、`.doc`。
+`DB_PATH` 的父目录需要已存在；如果已有数据库，请保留原来的数据库位置，例如 `DB_PATH=knowledge.db`。
+系统环境变量优先于 `.env`，修改配置后请重新运行命令，并检查输出中的实际路径。
+
 ```bash
 cd /opt/mcp-knowledge
 source .venv/bin/activate
 python -m app.ingest
 ```
 
+项目已创建虚拟环境时，也可以在项目根目录直接运行 `.venv/bin/python -m app.ingest`。
+还可以执行 `bash scripts/reindex.sh`，脚本会自动定位项目目录并使用项目的虚拟环境。
+
 如果成功，你会看到类似：
 ```bash
+[START] RAW_DIR=/opt/mcp-knowledge/raw
+[START] DB_PATH=/opt/mcp-knowledge/data/knowledge.db
+[SCAN] Looking for .txt, .pdf, .docx, .doc files...
+[SCAN] Found 2 supported file(s)
+[PARSING] /opt/mcp-knowledge/raw/hr/员工手册.pdf
 [INGESTED] /opt/mcp-knowledge/raw/hr/员工手册.pdf chunks=18
+[PARSING] /opt/mcp-knowledge/raw/product/产品说明.docx
 [INGESTED] /opt/mcp-knowledge/raw/product/产品说明.docx chunks=12
+[DONE] files=2 ingested=2 unchanged=0 skipped=0 removed=0
 ```
+
+该命令执行一次文档解析和 SQLite 索引后退出，不会启动 HTTP / MCP 服务，也不会自动监听文件变化。
+解析结果写入 `DB_PATH` 指定的数据库，不会在 `raw/` 中生成新文件。
+重复执行时，未修改的文档会显示 `[UNCHANGED]`，不会重复解析。
+目录不存在或不是目录时会显示 `[ERROR]` 并以非零状态退出，同时保留已有索引；目录有效但没有支持的文档时会显示 `[WARNING]`。
+`[SKIP] no text extracted` 表示没有提取到文本，请检查文档内容；扫描版 PDF 需要另外进行 OCR，当前解析器不会自动 OCR。
 
 ---
 
@@ -835,6 +868,20 @@ curl -X POST http://127.0.0.1:8000/api/search \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"query":"员工请假制度","limit":5}'
 ```
+
+`query` 按普通文本处理，多个空白分隔的关键词需要同时命中，空白查询返回空结果。
+后端会转义 SQLite FTS5 查询语法，因此 `P5-35`、`P5.35` 和包含引号的文本可以直接查询；`AND`、`OR` 等按普通词处理。
+全文检索仍使用 FTS5 的分词规则，标点通常是分隔符，因此 `P5-35` 也可能匹配 `P5 35`。
+例如服务运行在 8016 端口时：
+
+```bash
+curl -X POST http://127.0.0.1:8016/api/search \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"query":"P5-35","limit":5}'
+```
+
+修改搜索代码后需重启 Uvicorn，已有文档索引可以继续使用，无需重新运行 ingest。
 
 ## 3）查看全文
 ```bash
