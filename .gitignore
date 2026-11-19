@@ -3,15 +3,47 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
 
 # Env / secrets
 .env
+.env.*
+!.env.example
+.ssh/
+*.pem
+*.key
+id_rsa
+id_ed25519
 
-# Data / logs
-data/*.db
-data/*.db-*
-logs/*.log
+# Local agent / cloud configuration
+/.codex/
+/.agents/
+/.aws/
+
+# Runtime databases, source documents, logs, and backups
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+/raw/**
+!/raw/**/
+!/raw/**/.gitkeep
+/data/**
+!/data/**/
+!/data/**/.gitkeep
+/logs/**
+!/logs/**/
+!/logs/**/.gitkeep
+/backups/
+*.log
 
 # OS
 .DS_Store
 Thumbs.db
+Desktop.ini
