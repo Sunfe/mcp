@@ -1,8 +1,10 @@
 # MCP 文档知识库
 
-将 TXT、PDF、DOCX、DOC 文档解析到 SQLite FTS5，通过 FastAPI 和 MCP stdio 提供文档列表、全文检索及文档读取。支持 Linux 本机 Codex，以及 Windows Codex CLI / App 通过 SSH 访问 Linux 知识库。
+将 TXT、PDF、DOCX、DOC 文档解析到 SQLite FTS5，通过 FastAPI 和 MCP stdio 提供文档列表、全文检索及文档读取。支持 Linux 本机 Codex、Windows 本地部署，以及 Windows Codex CLI / App 通过 SSH 访问 Linux 知识库。
 
-完整的部署、SSH 密钥配置、Codex 接入、备份迁移与故障排查见 **[MCP部署与Codex接入手册](MCP部署与Codex接入手册.md)**。
+Windows 本地部署、后台启动、登录自启、MSYS / WSL 建立索引，以及 Codex 优先查询知识库的规则示例，见 **[Windows 本地部署说明](docs/codex-windows-local.md)**。
+
+Linux 部署、SSH 密钥配置、Codex 接入、备份迁移与故障排查见 **[MCP部署与Codex接入手册](docs/MCP部署与Codex接入手册.md)**。
 
 ## 快速启动
 
@@ -40,6 +42,7 @@ API 默认监听 `127.0.0.1:8016`。另开终端做 MCP 协议自检：
 - [Linux 本机配置](configs/codex-mcp-local.toml)
 - [使用 SSH 别名的配置](configs/codex-mcp.toml)
 - [Windows SSH 配置](configs/codex-mcp-windows.toml)
+- [Windows 本地配置](configs/codex-mcp-windows-local.toml)
 
 本机和 SSH 模板中的服务器目录是已验证环境的示例，迁移时需要修改。API 持续运行，MCP stdio 进程由 Codex 自动启动。
 
