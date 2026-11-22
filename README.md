@@ -2,6 +2,8 @@
 
 将 TXT、PDF、DOCX、DOC 文档解析到 SQLite FTS5，通过 FastAPI 和 MCP stdio 提供文档列表、全文检索及文档读取。支持 Linux 本机 Codex、Windows 本地部署，以及 Windows Codex CLI / App 通过 SSH 访问 Linux 知识库。
 
+已有一批文件时，从根目录的 **[操作说明](操作说明.md)** 开始：包含 Linux、MSYS2 / Git Bash、两种 WSL 运行方式，以及资料清单、索引、MCP 自检和 F00 评测。新增 F00 要求 Python 3.11+，各平台验证范围见该说明。
+
 Windows 本地部署、后台启动、登录自启、MSYS / WSL 建立索引，以及 Codex 优先查询知识库的规则示例，见 **[Windows 本地部署说明](docs/codex-windows-local.md)**。
 
 Linux 部署、SSH 密钥配置、Codex 接入、备份迁移与故障排查见 **[MCP部署与Codex接入手册](docs/MCP部署与Codex接入手册.md)**。

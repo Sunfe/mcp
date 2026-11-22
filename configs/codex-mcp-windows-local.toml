@@ -1,0 +1,15 @@
+[mcp_servers.knowledge-base]
+command = 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe'
+args = ['-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File', 'D:\repo\mcp\scripts\mcp_stdio.ps1']
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+enabled_tools = ["list_documents", "search_documents", "get_document"]
+
+[mcp_servers.knowledge-base.tools.list_documents]
+approval_mode = "approve"
+
+[mcp_servers.knowledge-base.tools.search_documents]
+approval_mode = "approve"
+
+[mcp_servers.knowledge-base.tools.get_document]
+approval_mode = "approve"
